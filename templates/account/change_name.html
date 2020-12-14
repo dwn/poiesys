@@ -1,0 +1,20 @@
+{% extends "account/account.html" %}
+{% block body %}
+  {% if session.logged_in %}
+    <form action=change_name method=post>
+      <input type=text readonly style='background-color:skyblue;color:black;text-align:center' value={{session.name}}>
+      <br><br>
+      <label for=new_name>{{m['new name']}}<br></label>
+      <input type=text name=new_name autofocus=autofocus>
+      <br><br>
+      <label for=password>{{m['password']}}<br></label>
+      <input type=password name=password>
+      <br><br>
+  {% endif %}
+{% endblock %}
+{% block button %}
+  {% if session.logged_in %}
+      <input class=btn type=submit value="{{m['change name']}}">
+    </form>
+  {% endif %}
+{% endblock %}

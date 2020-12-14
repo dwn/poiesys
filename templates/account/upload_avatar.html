@@ -1,0 +1,18 @@
+{% extends "account/account.html" %}
+{% block button %}
+  {% if session.logged_in %}
+    <img class=avatar src={{pth}}>
+    <br><br>
+    <form enctype=multipart/form-data  action=upload_avatar method=post>
+      <div class=input-div>
+        <div style='text-align:right'>
+          <label for=password>{{m['password']}}<br></label>
+          <input type=password name=password autofocus=autofocus>
+        </div>  
+      </div>  
+      <br><br>
+      <label class=btn-lbl for=files>{{m['upload avatar']}}</label>
+      <input class=avatar-click id=files type=file value='upload avatar' name=file onchange='form.submit();'>
+    </form>
+  {% endif %}
+{% endblock %}

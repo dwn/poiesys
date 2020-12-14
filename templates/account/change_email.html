@@ -1,0 +1,21 @@
+{% extends "account/account.html" %}
+{% block body %}
+  {% if session.logged_in %}
+    <form action=change_email method=post>
+      <label for=new_email>{{m['new email']}}<br></label>
+      <input type=email name=new_email autofocus=autofocus>
+      <br><br>
+      <label for=confirm_new_email>{{m['confirm new email']}}<br></label>
+      <input type=email name=confirm_new_email>
+      <br><br>
+      <label for=password>{{m['password']}}<br></label>
+      <input type=password name=password>
+      <br><br>
+  {% endif %}
+{% endblock %}
+{% block button %}
+  {% if session.logged_in %}
+      <input class=btn type=submit value="{{m['change email']}}">
+    </form>
+  {% endif %}
+{% endblock %}

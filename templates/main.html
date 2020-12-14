@@ -1,0 +1,306 @@
+<head>
+  <title>{{ m[app_name] }}</title>
+  <meta name=viewport content='user-scalable=no'>
+  <link rel=manifest href=static/manifest.json{{p}}>
+  <link rel=stylesheet type=text/css href=static/common.css{{p}}>
+  <link rel=stylesheet type=text/css href=static/main.css{{p}}>
+</head>
+<body style="font-family:{{ session['fnt'] }}">
+<div id=page>
+  <a href=upload_avatar title="{{ m['account'] }}" id=rgt-icn target=_blank>&#x2699;</a>
+  <canvas id=canvas oncontextmenu='event.preventDefault()' width=640 height=480></canvas>
+  <div id=spinner></div>
+  <div id=output-div><div id=status></div><span id=output></span></div>
+</div>
+<script src=static/xmeffects.js{{p}}></script>
+<script src=static/xm.js{{p}}></script>
+<script type='text/javascript'>
+var statusEl = document.getElementById('status');
+var spinnerEl = document.getElementById('spinner');
+var canvasEl = document.getElementById('canvas');
+var outputEl = document.getElementById('output');
+var outputDivEl = document.getElementById('output-div');
+var clickEv = 'click'; //Mouse until proven innocent
+
+function transformElement(el, xform) {
+  el.style.webkitTransform = xform;
+  el.style.mozTransform = xform;
+  el.style.msTransform = xform;
+  el.style.oTransform = xform;
+  el.style.transform = xform;
+}
+
+function setCanvasSizeRotateOn(w, h) {
+  wOld = canvasEl.style.width;
+  hOld = canvasEl.style.height;
+  canvasEl.style.width = w;
+  canvasEl.style.height = h;
+  xOffset = (parseInt(hOld) - h) >> 1;
+  yOffset = (w - parseInt(wOld)) >> 1;
+  transformElement(canvasEl, 'rotate(90deg) translate(' + xOffset + 'px,' + yOffset + 'px)');
+}
+
+function setRotateOff() {
+  transformElement(canvasEl, 'none');
+}
+
+function showOutput() {
+  outputDivEl.removeAttribute('style');
+  outputEl.removeAttribute('style');
+  outputDivEl.addEventListener(clickEv, hideOutput, 'once');
+}
+
+function hideOutput() {
+  window.speechSynthesis.cancel();
+  outputDivEl.setAttribute('style', 'display:none');
+  outputEl.innerText='';
+}
+
+function showUI() {
+  XMPlayer.play();
+  //window.dispatchEvent(new Event('resize')); //Trigger resize event
+  document.getElementById('rgt-icn').removeAttribute('style');
+  canvasEl.removeEventListener('click', showUI);
+  canvasEl.removeEventListener('touchstart', setTouch);
+}
+
+function setTouch() {
+  clickEv = 'touchstart';
+  showUI();
+}
+
+canvasEl.addEventListener('click', showUI);
+canvasEl.addEventListener('touchstart', setTouch);
+
+(function (window, document) {
+  if (!window.XMPlayer) {
+    window.XMPlayer = {};
+  }
+  window.onload = function() {
+    XMPlayer.init();
+    var xmReq = new XMLHttpRequest();
+    xmReq.open("GET", 'static/you-are-maybe.xm{{ p }}', true);
+    xmReq.responseType = "arraybuffer";
+    xmReq.onload = function(xmEvent) {
+      var arrayBuffer = xmReq.response;
+      if (arrayBuffer) {
+        XMPlayer.load(arrayBuffer);
+      } else {
+        console.log("unable to load .xm uri");
+      }
+    };
+    xmReq.send(null);
+  };
+})(window, document);
+
+var Module = {
+  preRun: [],
+  postRun: [],
+  print: (function() {
+    return function(text) {
+      if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ');
+      if (text.substr(text.length-17, text.length) === '[[setHideOutput]]') {
+        hideOutput();
+      } else if (text === '[[setRotateOff]]') {
+        setRotateOff();
+      } else if (text.substr(0,24) === '[[setCanvasSizeRotateOn,') {
+        var s = text.split(',');
+        setCanvasSizeRotateOn(s[1],s[2].substr(s[2], s[2].length-2));
+      } else if (text === '[[setPauseAudioOn]]') {
+        XMPlayer.pause();
+      } else if (text === '[[setPauseAudioOff]]') {
+        XMPlayer.play();
+      } else if (text === '[[setAccountPageOpen]]') {
+        window.speechSynthesis.cancel();
+        window.open('upload_avatar');
+        text=''; //Clear text
+      } else if (text.substr(0,11) === '[[setAudio,') {
+        var s = text.split(',');
+        XMPlayer.stop();
+        var xmReq = new XMLHttpRequest();
+        xmReq.open("GET", "static/" + s[1].substr(s[1], s[1].length-2) + "{{ p }}", true);
+        xmReq.responseType = "arraybuffer";
+        xmReq.onload = function(xmEvent) {
+          var arrayBuffer = xmReq.response;
+          if (arrayBuffer) {
+            XMPlayer.load(arrayBuffer);
+            XMPlayer.play();
+          } else {
+            console.log("unable to load .xm uri");
+          }
+        };
+        xmReq.send(null);
+      } else {  
+        // These replacements are necessary if you render to raw HTML
+        //text = text.replace(/&/g, "&amp;");
+        //text = text.replace(/</g, "&lt;");
+        //text = text.replace(/>/g, "&gt;");
+        //text = text.replace('\n', '<br>', 'g');
+        console.log(text);
+        if (outputEl) {
+          outputEl.innerText += text + "\n";
+          outputEl.scrollTop = outputEl.scrollHeight; // focus on bottom
+          var utterance = new SpeechSynthesisUtterance(text);
+          utterance.lang = "en-US";
+          utterance.volume = 0.15;
+          window.speechSynthesis.speak(utterance);
+        }
+        showOutput();
+      }
+    };
+  })(),
+  printErr: function(text) {
+    if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ');
+    if (0) { // XXX disabled for safety typeof dump == 'function') {
+      dump(text + '\n'); // fast, straight to the real console
+    } else {
+      console.error(text);
+    }
+  },
+  canvas: (function() {
+    return document.getElementById('canvas');
+  })(),
+  setStatus: function(text) {
+    if (text==='Running...') {
+      spinnerEl.remove();
+    }
+    statusEl.innerHTML = text;
+  },
+  totalDependencies: 0,
+  monitorRunDependencies: function(left) {
+    this.totalDependencies = Math.max(this.totalDependencies, left);
+    Module.setStatus(left ? 'Preparing... (' + (this.totalDependencies-left) + '/' + this.totalDependencies + ')' : 'All downloads complete.');
+  }
+};
+Module.setStatus('Downloading...');
+window.onerror = function(event) {
+  // TODO: do not warn on ok events like simulating an infinite loop or exitStatus
+  Module.setStatus('Exception thrown, see JavaScript console');
+  spinnerEl.remove();
+  Module.setStatus = function(text) {
+    if (text) Module.printErr('[post-exception status] ' + text);
+  };
+};
+
+var ASSERTIONS = 0;
+// Prefix of data URIs emitted by SINGLE_FILE and related options.
+var dataURIPrefix = 'data:application/octet-stream;base64,';
+
+// Indicates whether filename is a base64 data URI.
+function isDataURI(filename) {
+  return String.prototype.startsWith ?
+      filename.startsWith(dataURIPrefix) :
+      filename.indexOf(dataURIPrefix) === 0;
+}
+
+// Copied from https://github.com/strophe/strophejs/blob/e06d027/src/polyfills.js#L149
+
+/**
+ * Decodes a base64 string.
+ * @param {String} input The string to decode.
+ */
+var decodeBase64 = typeof atob === 'function' ? atob : function (input) {
+  var keyStr = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
+  var output = '';
+  var chr1, chr2, chr3;
+  var enc1, enc2, enc3, enc4;
+  var i = 0;
+  // remove all characters that are not A-Z, a-z, 0-9, +, /, or =
+  input = input.replace(/[^A-Za-z0-9\+\/\=]/g, '');
+  do {
+    enc1 = keyStr.indexOf(input.charAt(i++));
+    enc2 = keyStr.indexOf(input.charAt(i++));
+    enc3 = keyStr.indexOf(input.charAt(i++));
+    enc4 = keyStr.indexOf(input.charAt(i++));
+
+    chr1 = (enc1 << 2) | (enc2 >> 4);
+    chr2 = ((enc2 & 15) << 4) | (enc3 >> 2);
+    chr3 = ((enc3 & 3) << 6) | enc4;
+
+    output = output + String.fromCharCode(chr1);
+
+    if (enc3 !== 64) {
+      output = output + String.fromCharCode(chr2);
+    }
+    if (enc4 !== 64) {
+      output = output + String.fromCharCode(chr3);
+    }
+  } while (i < input.length);
+  return output;
+};
+
+// Converts a string of base64 into a byte array.
+// Throws error on invalid input.
+function intArrayFromBase64(s) {
+  if (typeof ENVIRONMENT_IS_NODE === 'boolean' && ENVIRONMENT_IS_NODE) {
+    var buf;
+    try {
+      buf = Buffer.from(s, 'base64');
+    } catch (_) {
+      buf = new Buffer(s, 'base64');
+    }
+    return new Uint8Array(buf.buffer, buf.byteOffset, buf.byteLength);
+  }
+
+  try {
+    var decoded = decodeBase64(s);
+    var bytes = new Uint8Array(decoded.length);
+    for (var i = 0 ; i < decoded.length ; ++i) {
+      bytes[i] = decoded.charCodeAt(i);
+    }
+    return bytes;
+  } catch (_) {
+    throw new Error('Converting base64 string to bytes failed.');
+  }
+}
+
+// If filename is a base64 data URI, parses and returns data (Buffer on node,
+// Uint8Array otherwise). If filename is not a base64 data URI, returns undefined.
+function tryParseAsDataURI(filename) {
+  if (!isDataURI(filename)) {
+    return;
+  }
+
+  return intArrayFromBase64(filename.slice(dataURIPrefix.length));
+}
+/** @type {function(string, boolean=, number=)} */
+function intArrayFromString(stringy, dontAddNull, length) {
+  var len = length > 0 ? length : lengthBytesUTF8(stringy)+1;
+  var u8array = new Array(len);
+  var numBytesWritten = stringToUTF8Array(stringy, u8array, 0, u8array.length);
+  if (dontAddNull) u8array.length = numBytesWritten;
+  return u8array;
+}
+
+function intArrayToString(array) {
+  var ret = [];
+  for (var i = 0; i < array.length; i++) {
+    var chr = array[i];
+    if (chr > 0xff) {
+      if (ASSERTIONS) {
+        assert(false, 'Character code ' + chr + ' (' + String.fromCharCode(chr) + ')  at offset ' + i + ' not in 0x00-0xFF.');
+      }
+      chr &= 0xff;
+    }
+    ret.push(String.fromCharCode(chr));
+  }
+  return ret.join('');
+}
+
+var memoryInitializer = 'static/app.html.mem{{ p }}';
+if (typeof Module['locateFile'] === 'function') {
+  memoryInitializer = Module['locateFile'](memoryInitializer);
+} else if (Module['memoryInitializerPrefixURL']) {
+  memoryInitializer = Module['memoryInitializerPrefixURL'] + memoryInitializer;
+}
+Module['memoryInitializerRequestURL'] = memoryInitializer;
+var meminitXHR = Module['memoryInitializerRequest'] = new XMLHttpRequest();
+meminitXHR.open('GET', memoryInitializer, true);
+meminitXHR.responseType = 'arraybuffer';
+meminitXHR.send(null);
+
+var script = document.createElement('script');
+script.src = 'static/app.js{{ p }}';
+document.body.appendChild(script);
+</script>
+</body>

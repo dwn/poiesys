@@ -1,0 +1,31 @@
+#MariaDb setup instruction: https://www.liquidweb.com/kb/how-to-install-mariadb-5-5-on-ubuntu-14-04-lts/
+
+sql=$(cat <<EOF
+
+#Only for localhost
+#To set up user admin: grant all privileges on *.* to admin@localhost; flush privileges;
+drop database if exists app;
+create database app;
+use app;
+
+#For any host
+create table usr (
+  id int primary key auto_increment,
+  name tinytext not null,
+  email tinytext not null,
+  password tinytext not null,
+  flag text,
+  lng char(2) not null,
+  role_id int not null,
+  score int not null,
+  num_plays int not null,
+  created_at timestamp);
+create table hst (
+  id int primary key auto_increment,
+  usr_id int not null,
+  txt text not null,
+  created_at timestamp);
+
+EOF
+)
+echo ${sql} | mysql -u admin -p

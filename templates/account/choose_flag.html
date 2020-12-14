@@ -1,0 +1,18 @@
+{% extends "account/account.html" %}
+{% block button %}
+  {% if session.logged_in %}
+    <a id='flag-display'/>
+    {% for flag in all_flag %}
+      {% if flag[:-4] in arr_flag %}
+        <div class=flag-chosen-div>
+      {% else %}
+        <div class=flag-div>
+      {% endif %}
+          <a href=toggle_flag/{{flag[:-4]}}>
+            <img src=static/flag/{{flag}}{{p}} class=flag>
+            <div class=flag-text>{{flag[:-4]}}</div>
+          </a>  
+        </div>
+    {% endfor %}
+  {% endif %}
+{% endblock %}

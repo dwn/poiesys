@@ -1,0 +1,7 @@
+<body bgcolor=darkblue>
+{% if session.logged_in %}
+  <meta http-equiv="refresh" content="0; URL='main'" />
+{% else %}
+  <meta http-equiv="refresh" content="0; URL='log_in'" />
+{% endif %}
+</body>

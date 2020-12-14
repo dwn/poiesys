@@ -1,0 +1,11 @@
+printf 'web: gunicorn app:app' > Procfile
+python --version > runtime.txt 2>&1
+str=$(cat runtime.txt | tr '[:upper:]' '[:lower:]')
+str=${str// /-}
+echo $str > runtime.txt 2>&1
+cat runtime.txt Procfile
+echo
+git add .
+git commit -m 'deploy'
+git push origin master --force
+rm -f runtime.txt Procfile

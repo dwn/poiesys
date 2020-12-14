@@ -1,0 +1,15 @@
+{% extends "account/account.html" %}
+{% block body %}
+  {% if not session.logged_in %}
+    <form action=register method=post>
+      <label for=email>{{m['email']}}<br></label>
+      <input type=email name=email autofocus=autofocus>
+      <br><br>
+  {% endif %}
+{% endblock %}
+{% block button %}
+  {% if not session.logged_in %}
+      <input class=btn type=submit value="{{m['register']}}">
+    </form>
+  {% endif %}
+{% endblock %}

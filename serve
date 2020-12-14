@@ -1,0 +1,16 @@
+./build
+
+version="$(date)"
+printf "#define APP_VERSION \"${version} \"" > app/appy/Version.h
+printf ' * Version %s\n' "${version}"
+#sudo -H pip install -r requirements.txt
+printf " * Moving app bin files\n"
+rm -f static/app.js static/app.html.mem static/app.html
+rm -f app/bin/*.html
+mv app/bin/app.js static/ 2> /dev/null
+mv app/bin/app.html.mem static/ 2> /dev/null
+python app.py
+printf ' Deleting .pyc files\n'
+find . -name '*.pyc' -type f -delete
+printf '\e[1;31m%-6s\e[m\n' 'CHECK BEFORE DEPLOY:'
+grep -Ir DISABLE_CACHE config.py

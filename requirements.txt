@@ -1,0 +1,7 @@
+Flask==0.12.2
+Flask-Mail==0.9.1
+Flask-SSLify==0.1.5
+gunicorn==19.7.1
+Jinja2==2.8
+PyMySQL==0.8.0
+pycrypto==2.6.1

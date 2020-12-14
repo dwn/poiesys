@@ -1,0 +1,139 @@
+<head>
+  {% if session['logged_in'] %}
+    {% set box='blue-box' %}
+    <title>{{m['account']}}</title>
+  {% else %}
+    {% set box='green-box' %}
+    <title>{{app_name_undecorated}}</title>
+  {% endif %}  
+  <meta name=viewport content='user-scalable=no'>
+  <link rel='shortcut icon' type=image/x-icon href=static/favicon.ico{{p}}>
+  <link rel=stylesheet type=text/css href=static/common.css{{p}}>
+  <link rel=stylesheet type=text/css href=static/account.css{{p}}>
+</head>
+<body style="font-family:{{session['fnt']}}">
+  {% if session['logged_in'] %}
+    <a href="javascript:window.open('','_self').close();" id=rgt-icn>&#x274e</a><br>
+  {% else %}
+    <audio autoplay loop><source src=static/Chuzausen_-_04_-_Mr_Default.mp3{{p}} type=audio/mpeg></audio>
+  {% endif %}  
+  <div id=page>
+    <div class='hdg gray-box'>
+      {% if session['logged_in'] %}
+        <script>
+          document.body.style['background-image']='url(static/account-bkg-16.gif{{p}})';
+        </script>
+        {{m['account']}}
+      {% else %}
+        <script>
+          document.body.style['background-image']='url(static/city.gif{{p}})';
+        </script>
+        <img src=static/keeponwalking_800x600.gif{{p}} style='width:260px;-webkit-transform:scaleX(-1);transform:scaleX(-1)'>
+        <div style='display:inline-block'>
+          <div class=text-over-image-div>
+            <div class=avatar style="background:radial-gradient(circle,rgba(0,0,0,0) 30%,rgba(220,160,0,1.5) 67%,rgba(180,0,0,1)),url('static/shout-0.jpg{{p}}')"></div>
+            <p class=text-over-image>{{m[app_name]}}</p>
+          </div>
+          <img src=static/wave.gif{{p}} style='height:40px'>
+        </div>
+        <img src=static/keeponwalking_800x600.gif{{p}} style='width:260px'>
+      {% endif %}
+    </div>
+    <div class={{box}}>
+      {% if session.logged_in %}
+        <img src=static/oar.png{{p}} style='height:250px;margin:0px 100px'>
+        <div style='display:inline-block'>
+          <a href='' onclick="if (confirm('{{m["log out"]}}?')) { window.opener.location.href='log_out'; window.open('','_self').close(); } else return false;">{{m['log out']}}</a><br>
+          <a href=upload_avatar>{{m['upload avatar']}}</a><br>
+          <a href=choose_flag#flag-display>{{m['choose flag']}}</a><br>
+          <a href=change_language>{{m['change language']}}</a><br>
+          <a href=change_name>{{m['change name']}}</a><br>
+          <a href=change_email>{{m['change email']}}</a><br>
+          <a href=change_password>{{m['change password']}}</a><br>
+          <a href=delete_account>{{m['delete account']}}</a><br>
+        </div>
+        <img src=static/quill-pen.png{{p}} style='height:250px;margin:0px 100px'>
+      {% else %}
+        <img src=static/star.gif{{p}} style='width:100px'>
+        <div style='display:inline-block'>
+          <a href=log_in>{{m['log in']}}</a><br><br>
+          <a href=register>{{m['register']}}</a><br><br>
+          <a href=forgot_password>{{m['forgot password']}}</a><br>
+        </div>
+        <img src=static/star.gif{{p}} style='width:100px;-webkit-transform:scaleX(-1);transform:scaleX(-1)'>
+      {% endif %}
+    </div>
+    {% for category, message in get_flashed_messages(with_categories=true) %}
+      <br>
+      <div class="{{category}}">{{m[message]}}</div>
+    {% endfor %}
+    <div class={{box}}>
+      <!-- <div class=input-div> -->
+        <!-- <div style='text-align:right'> -->
+      {% block body %}{% endblock %}
+        <!-- </div> -->
+      <!-- </div> -->
+      {% block button %}{% endblock %}
+    </div>
+    {% if not session['logged_in'] %}
+      <div class={{box}}>
+        <span class=lng-text>{{m['language']}}</span>
+        <br>
+        <div class=lng-div>
+          <a href=language/en>
+            <img src=static/flag/gb.png{{p}} class=flag>
+          </a>  
+        </div>
+        <div class=lng-div>
+          <a href=language/de>
+            <img src=static/flag/de.png{{p}} class=flag>
+          </a>  
+        </div>
+        <div class=lng-div>
+          <a href=language/fr>
+            <img src=static/flag/fr.png{{p}} class=flag>
+          </a>  
+        </div>
+        <div class=lng-div>
+          <a href=language/es>
+            <img src=static/flag/es.png{{p}} class=flag>
+          </a>  
+        </div>
+        <div class=lng-div>
+          <a href=language/pt>
+            <img src=static/flag/pt.png{{p}} class=flag>
+          </a>  
+        </div>
+        <div class=lng-div>
+          <a href=language/ru>
+            <img src=static/flag/ru.png{{p}} class=flag>
+          </a>  
+        </div>
+        <div class=lng-div>
+          <a href=language/hr>
+            <img src=static/flag/hr.png{{p}} class=flag>
+          </a>  
+        </div>
+        <div class=lng-div>
+          <a href=language/hi>
+            <img src=static/flag/in.png{{p}} class=flag>
+          </a>  
+        </div>
+      </div>
+    {% endif %}
+  </div>
+<script>
+document.onkeydown = function(evt) {
+  evt = evt || window.event;
+  var isEscape = false;
+  if ("key" in evt) {
+    isEscape = (evt.key == "Escape" || evt.key == "Esc");
+  } else {
+    isEscape = (evt.keyCode == 27);
+  }
+  if (isEscape) {
+    window.open('','_self').close();
+  }
+};
+</script>
+</body>

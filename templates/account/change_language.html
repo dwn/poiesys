@@ -1,0 +1,47 @@
+{% extends "account/account.html" %}
+{% block button %}
+  {% if session.logged_in %}
+    <span class='lng-text'>{{m['language']}}</span>
+    <br>
+    <div class=lng-div>
+      <a href=language/en>
+        <img srcstatic/flag/gb.png{{p}} class=flag>
+      </a>  
+    </div>
+    <div class=lng-div>
+      <a href=language/de>
+        <img srcstatic/flag/de.png{{p}} class=flag>
+      </a>  
+    </div>
+    <div class=lng-div>
+      <a href=language/fr>
+        <img srcstatic/flag/fr.png{{p}} class=flag>
+      </a>  
+    </div>
+    <div class=lng-div>
+      <a href=language/es>
+        <img srcstatic/flag/es.png{{p}} class=flag>
+      </a>  
+    </div>
+    <div class=lng-div>
+      <a href=language/pt>
+        <img srcstatic/flag/pt.png{{p}} class=flag>
+      </a>  
+    </div>
+    <div class=lng-div>
+      <a href=language/ru>
+        <img srcstatic/flag/ru.png{{p}} class=flag>
+      </a>  
+    </div>
+    <div class=lng-div>
+      <a href=language/hr>
+        <img srcstatic/flag/hr.png{{p}} class=flag>
+      </a>  
+    </div>
+    <div class=lng-div>
+      <a href=language/hi>
+        <img srcstatic/flag/in.png{{p}} class=flag>
+      </a>  
+    </div>
+  {% endif %}
+{% endblock %}

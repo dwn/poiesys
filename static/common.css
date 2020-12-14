@@ -1,0 +1,8 @@
+@font-face { font-family:roman; src:url(roman.ttf); }
+@font-face { font-family:cyrillic; src:url(cyrillic.ttf); }
+body {
+  color:ivory;  
+  background-color:black;
+  text-align:center;
+  cursor:crosshair;
+}

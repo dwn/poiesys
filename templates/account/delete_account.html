@@ -1,0 +1,22 @@
+{% extends "account/account.html" %}
+{% block body %}
+  {% if session.logged_in %}
+    <form action=delete_account method=post>
+      <label for=password>{{m['password']}}<br></label>
+      <input type=password name=password>
+      <br><br>
+      <label for=type_these_words_delete_this_account>{{m['type these words: delete this account']}}<br></label>
+      <input type=text name=type_these_words_delete_this_account>
+      <br><br>
+  {% endif %}
+{% endblock %}
+{% block button %}
+  {% if session.logged_in %}
+      <div style='background-color:crimson'>
+        <font color=white size=4>{{m['this option will delete all your data permanently!']}}</font>
+      </div>
+      <br>
+      <input class=btn type=submit value="{{m['delete account']}}">
+    </form>
+  {% endif %}
+{% endblock %}
